@@ -1,0 +1,75 @@
+{
+    "integrations": [
+        {
+            "name": "MakePaymentWithSDK",
+            "type": "SDK",
+            "sdkClass": "com.sdk.pymt.PaymentService",
+            "method": "makePayment",
+            "sdkConfig": {
+                "apiKey": "your-api-key",
+                "environment": "PRODUCTION"
+            },
+            "requestDto": "com.app.intg.pymt.dto.MakePymtRequest",
+            "responseDto": "com.app.intg.pymt.dto.MakePymtResponse",
+            "sdkRequestDto": "com.sdk.pymt.dto.MakePymtSDKRequest",
+            "sdkResponseDto": "com.sdk.pymt.dto.MakePymtSDKResponse",
+            "requestFieldMapping": {
+                "transactionAmount": { "field": "txnAmount" },
+                "transactionCurrency": { "field": "txnCurr" },
+                "emailAddress": { 
+                "field": "emailAddr", 
+                "mapperMethod": "com.app.intg.pymt.PymtCustomMappers::mapEmail" 
+                }
+            },
+            "responseFieldMapping": {
+                "txnId": { "field": "transactionId" },
+                "statusMsg": { 
+                "field": "statusMessage", 
+                "mapperMethod": "com.app.intg.pymt.PymtCustomMappers::mapStatus" 
+                }
+            }
+        },
+        {
+            "name": "CreateUserWithSDK",
+            "type": "SDK",
+            "sdkClass": "com.sdk.user.UserManagement",
+            "method": "createUser",
+            "sdkConfig": {
+                "apiKey": "your-api-key",
+                "environment": "PRODUCTION"
+            },
+            "requestDto": "com.app.intg.user.dto.CreateUserRequest",
+            "responseDto": "com.app.intg.user.dto.CreateUserResponse",
+            "sdkRequestDto": "com.sdk.user.dto.CreateUserSDKRequest",
+            "sdkResponseDto": "com.sdk.user.dto.CreateUserSDKResponse",
+            "requestFieldMapping": {
+                "firstName": { "field": "fName" },
+                "lastName": { "field": "lName" },
+                "email": { 
+                "field": "emailAddress", 
+                "mapperMethod": "com.app.intg.user.UserCustomMappers::mapEmail" 
+                }
+            },
+            "responseFieldMapping": {
+                "uId": { "field": "userId" },
+                "statusMsg": { 
+                "field": "statusMessage", 
+                "mapperMethod": "com.app.intg.user.UserCustomMappers::mapStatus" 
+                }
+            }
+        },
+        {
+            "name": "CreateUserWithREST",
+            "type": "REST",
+            "swaggerUrl": "https://api.example.com",
+            "endpoint": "/users",
+            "httpMethod": "POST",
+            "headers": {
+            "Authorization": "Bearer your-api-key"
+            },
+            "requestDto": "com.example.dto.CreateUserRequest",
+            "responseDto": "com.example.dto.CreateUserResponse"
+        }
+    ]
+}
+  
