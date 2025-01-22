@@ -1,5 +1,6 @@
 package com.fw.intg;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fw.intg.IntegrationConfig.Integration;
 
@@ -16,10 +17,11 @@ import javax.xml.namespace.QName;
 import java.net.URL;
 import java.util.Map;
 import java.io.File;
+import java.lang.reflect.Field;
 
 public class IntegrationFramework {
 
-    private static final String CONFIG_PATH = "/Users/sudan/IntegrationFramework/intg_fw/src/main/java/com/app/intg/config.json";
+    private static final String CONFIG_PATH = "/Users/sudan/Documents/GitHub/IntegrationFw/src/main/java/com/payment_app/intg/config.json";
     private IntegrationConfig config;
 
     public IntegrationFramework() {
@@ -89,6 +91,59 @@ public class IntegrationFramework {
     private Object executeRestWithDto(Integration integration, Object requestDto) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Convert request DTO to JSON
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        // Build headers
+        HttpHeaders headers = new HttpHeaders();
+        if (integration.getHeaders() != null) {
+            integration.getHeaders().forEach(headers::set);
+        }
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
+
+        // Make the REST call
+        ResponseEntity<String> response = restTemplate.exchange(
+                integration.getSwaggerUrl() + integration.getEndpoint(),
+                HttpMethod.valueOf(integration.getHttpMethod()),
+                entity,
+                String.class
+        );
+
+        // Parse the JSON response
+        JsonNode rootNode = objectMapper.readTree(response.getBody());
+
+        // Create and populate the response DTO
+        Class<?> responseDtoClass = Class.forName(integration.getResponseDto());
+        Object responseDto = responseDtoClass.getDeclaredConstructor().newInstance();
+
+        // Use responseMapping from configuration
+        Map<String, String> responseMapping = integration.getResponseMapping();
+        for (Map.Entry<String, String> entry : responseMapping.entrySet()) {
+            String dtoField = entry.getValue(); // Field in the DTO
+            String jsonPath = entry.getKey(); // JSON path from the response
+
+            // Extract value from JSON using the JSON path
+            JsonNode valueNode = rootNode.at("/"+jsonPath.replace('.', '/'));
+            Field field = responseDtoClass.getDeclaredField(dtoField);
+            field.setAccessible(true);
+
+            // Populate the DTO field based on its type
+            if (field.getType().equals(int.class)) {
+                field.set(responseDto, valueNode.asInt());
+            } else {
+                field.set(responseDto, valueNode.asText());
+            }
+        }
+
+        return responseDto;
+    }
+
+    /*
+    private Object executeRestWithDto(Integration integration, Object requestDto) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        ObjectMapper objectMapper = new ObjectMapper();
 
         // Convert request DTO to JSON
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
@@ -117,7 +172,8 @@ public class IntegrationFramework {
         // Deserialize the response JSON into the response DTO
         Class<?> responseDtoClass = Class.forName(integration.getResponseDto());
         return objectMapper.readValue(response.getBody(), responseDtoClass);
-    }
+    } 
+    */
 
     private Object executeSoapWithDto(Integration integration, Object requestDto) throws Exception {
         URL wsdlURL = new URL(integration.getWsdlUrl());

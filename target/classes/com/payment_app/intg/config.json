@@ -1,0 +1,102 @@
+{
+    "integrations": [
+        {
+            "name": "CTBC_MakePaymentWithSDK",
+            "type": "SDK",
+            "sdkClass": "com.sdk.ctbc.CTBCPaymentService",
+            "method": "makePayment",
+            "sdkConfig": {
+                "apiKey": "api-key",
+                "environment": "PRODUCTION"
+            },
+            "requestDto": "com.payment_app.dto.PymtRequest",
+            "responseDto": "com.payment_app.dto.PymtResponse",
+            "sdkRequestDto": "com.sdk.ctbc.dto.CTBCPymtSDKRequest",
+            "sdkResponseDto": "com.sdk.ctbc.dto.CTBCPymtSDKResponse",
+            "requestFieldMapping": {
+                "transactionAmount": { "field": "txnAmount" },
+                "transactionCurrency": { "field": "txnCurr" },
+                "emailAddress": { 
+                "field": "emailAddr", 
+                "mapperMethod": "com.payment_app.intg.ctbc.CTBCPymtCustomMappers::mapEmail" 
+                }
+            },
+            "responseFieldMapping": {
+                "txnId": { "field": "transactionId" },
+                "statusMsg": { 
+                "field": "statusMessage", 
+                "mapperMethod": "com.payment_app.intg.ctbc.CTBCPymtCustomMappers::mapStatus" 
+                }
+            }
+        },
+        {
+            "name": "CyberSource_MakePaymentWithSDK",
+            "type": "SDK",
+            "sdkClass": "com.sdk.cybersource.CyberSourcePaymentService",
+            "method": "makePayment",
+            "sdkConfig": {
+                "apiKey": "api-key",
+                "environment": "PRODUCTION"
+            },
+            "requestDto": "com.payment_app.dto.PymtRequest",
+            "responseDto": "com.payment_app.dto.PymtResponse",
+            "sdkRequestDto": "com.sdk.cybersource.dto.CyberSourcePymtSDKRequest",
+            "sdkResponseDto": "com.sdk.cybersource.dto.CyberSourcePymtSDKResponse",
+            "requestFieldMapping": {
+                "transactionAmount": { "field": "txnAmount" },
+                "transactionCurrency": { "field": "txnCurr" },
+                "emailAddress": { "field": "emailAddr"}
+            },
+            "responseFieldMapping": {
+                "txn_id": { "field": "transactionId" },
+                "status_msg": { "field": "statusMessage"}
+            }
+        },
+        {
+            "name": "CreateUserWithSDK",
+            "type": "SDK",
+            "sdkClass": "com.sdk.user.UserManagement",
+            "method": "createUser",
+            "sdkConfig": {
+                "apiKey": "api-key",
+                "environment": "PRODUCTION"
+            },
+            "requestDto": "com.payment_app.dto.UserRequest",
+            "responseDto": "com.payment_app.dto.UserResponse",
+            "sdkRequestDto": "com.sdk.user.dto.CreateUserSDKRequest",
+            "sdkResponseDto": "com.sdk.user.dto.CreateUserSDKResponse",
+            "requestFieldMapping": {
+                "firstName": { "field": "fName" },
+                "lastName": { "field": "lName" },
+                "email": { 
+                "field": "emailAddress", 
+                "mapperMethod": "com.payment_app.intg.user.UserCustomMappers::mapEmail" 
+                }
+            },
+            "responseFieldMapping": {
+                "uId": { "field": "userId" },
+                "statusMsg": { 
+                "field": "statusMessage", 
+                "mapperMethod": "com.payment_app.intg.user.UserCustomMappers::mapStatus" 
+                }
+            }
+        },
+        {
+            "name": "CreateUserWithREST",
+            "type": "REST",
+            "swaggerUrl": "https://reqres.in/api",
+            "endpoint": "/users/2",
+            "httpMethod": "GET",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "api-key"
+            },
+            "responseDto": "com.payment_app.dto.UserResponse",
+            "responseMapping": {
+                "data.id": "userId",
+                "data.avatar": "statusMessage"
+            }
+        }
+    ]
+}
+  

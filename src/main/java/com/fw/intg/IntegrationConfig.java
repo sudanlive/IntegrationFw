@@ -44,6 +44,7 @@ public class IntegrationConfig {
         private String sdkResponseDto;
         private Map<String, Map<String, String>> requestFieldMapping;
         private Map<String, Map<String, String>> responseFieldMapping;
+        private Map<String, String> responseMapping;
 
         public String getName() {
             return this.name;
@@ -195,6 +196,14 @@ public class IntegrationConfig {
 
         public Map<String, Map<String, String>> getResponseFieldMapping() {
             return responseFieldMapping;
+        }
+
+        public void setResponseMapping(Map<String, String> responseMapping) {
+            this.responseMapping = responseMapping;
+        }
+
+        public Map<String, String> getResponseMapping() {
+            return responseMapping;
         }
 
         public void setSdkRequestDto(String sdkRequestDto) {
